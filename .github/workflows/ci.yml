@@ -1,0 +1,42 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type Check
+        run: npm run type-check # Assumes a script like "tsc --noEmit" exists in package.json
+        continue-on-error: true # Next.js handles TS checking in build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          # Dummy values for build phase to satisfy Next.js validations
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
+
+      - name: Run Tests
+        run: npm run test # Assumes "test": "jest" or similar in package.json
+        continue-on-error: true # Optional: depending on if tests exist yet

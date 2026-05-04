@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary:   #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card:      #1e293b;
+    --bg-card-hover:#253347;
+    --border:       #334155;
+    --text-primary: #f1f5f9;
+    --text-muted:   #94a3b8;
+    --accent:       #6366f1;
+    --accent-light: #818cf8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.35);
+    color: #f1f5f9;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+}
+
+@layer components {
+  /* ── Glass Card ── */
+  .card {
+    @apply rounded-xl border border-slate-700/60 bg-slate-800/60 backdrop-blur-sm;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-500 active:scale-95;
+  }
+  .btn-secondary {
+    @apply btn bg-slate-700 text-slate-200 hover:bg-slate-600 active:scale-95;
+  }
+  .btn-danger {
+    @apply btn bg-red-600/80 text-white hover:bg-red-500 active:scale-95;
+  }
+  .btn-ghost {
+    @apply btn text-slate-400 hover:bg-slate-700/60 hover:text-slate-200;
+  }
+
+  /* ── Inputs ── */
+  .input {
+    @apply w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm
+           text-slate-100 placeholder-slate-500
+           focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/50
+           transition-colors duration-150;
+  }
+
+  /* ── Status Badges ── */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-green  { @apply badge bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25; }
+  .badge-yellow { @apply badge bg-amber-500/15   text-amber-400   ring-1 ring-amber-500/25;   }
+  .badge-red    { @apply badge bg-red-500/15      text-red-400     ring-1 ring-red-500/25;     }
+  .badge-gray   { @apply badge bg-slate-500/20    text-slate-400   ring-1 ring-slate-500/25;   }
+  .badge-blue   { @apply badge bg-blue-500/15     text-blue-400    ring-1 ring-blue-500/25;    }
+
+  /* ── Table ── */
+  .table-wrapper {
+    @apply w-full overflow-x-auto rounded-xl border border-slate-700/60;
+  }
+  .table {
+    @apply w-full border-collapse text-sm;
+  }
+  .table th {
+    @apply bg-slate-800/80 px-4 py-3 text-left text-xs font-semibold
+           uppercase tracking-wider text-slate-400 whitespace-nowrap;
+  }
+  .table td {
+    @apply px-4 py-3 text-slate-300 border-t border-slate-700/50 whitespace-nowrap;
+  }
+  .table tr:hover td {
+    @apply bg-slate-700/30;
+  }
+
+  /* ── Sidebar nav link ── */
+  .nav-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
+           text-slate-400 transition-all duration-150
+           hover:bg-slate-700/60 hover:text-slate-100;
+  }
+  .nav-link-active {
+    @apply nav-link bg-brand-600/20 text-brand-400
+           ring-1 ring-brand-500/30 hover:bg-brand-600/25 hover:text-brand-300;
+  }
+
+  /* ── Page heading ── */
+  .page-title {
+    @apply text-2xl font-bold text-slate-100 tracking-tight;
+  }
+  .page-subtitle {
+    @apply text-sm text-slate-400;
+  }
+
+  /* ── Stat card ── */
+  .stat-card {
+    @apply card p-5 flex flex-col gap-1 hover:border-brand-500/40 transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-400 to-indigo-300 bg-clip-text text-transparent;
+  }
+  .glow-accent {
+    box-shadow: 0 0 24px rgba(99, 102, 241, 0.25);
+  }
+  .animate-in {
+    @apply animate-fade-in;
+  }
+}
