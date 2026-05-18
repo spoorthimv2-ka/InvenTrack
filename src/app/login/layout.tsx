@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sign In — InvenTrack",
   description: "Sign in to your InvenTrack account.",
