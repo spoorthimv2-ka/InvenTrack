@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getAppSettings, updateAppSettings } from "@/lib/api/settings";
-import { SettingsSection, SettingsField, SaveBar, Toast, ToggleSwitch } from "@/components/settings/SettingsUI";
+import { SettingsSection, SettingsField, SaveBar, Toast } from "@/components/settings/SettingsUI";
 import { Server } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -59,8 +59,9 @@ export default function SystemSettingsPage() {
         setDirty(false);
         showToast("System settings saved!", "success");
       }
-    } catch (err: any) {
-      showToast(err.message || "Network error", "error");
+    } catch (err: Error | unknown) {
+      const message = err instanceof Error ? err.message : "Network error";
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }

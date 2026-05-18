@@ -56,8 +56,9 @@ export default function NotificationsSettingsPage() {
         setDirty(false);
         showToast("Notification preferences saved!", "success");
       }
-    } catch (err: any) {
-      showToast(err.message || "Network error", "error");
+    } catch (err: Error | unknown) {
+      const message = err instanceof Error ? err.message : "Network error";
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }

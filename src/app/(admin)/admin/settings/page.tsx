@@ -1,6 +1,5 @@
 "use client";
 
-import { requireAdmin } from "@/lib/auth/getUserRole";
 import Link from "next/link";
 import {
   User, Settings2, Bell, Users, Shield, Server,

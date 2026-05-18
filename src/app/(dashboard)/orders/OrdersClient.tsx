@@ -32,10 +32,10 @@ export default function OrdersClient() {
 
   const { isAdmin } = useAuth();
   const [selected, setSelected] = useState<Order | null>(null);
-  const [showAdd,  setShowAdd]   = useState(false);
-  const [isSaving, setIsSaving]  = useState(false);
-  const [newOrderNotes, setNewOrderNotes] = useState("");
-  const [newOrderDate, setNewOrderDate] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [newOrderNotes, setNewOrderNotes] = useState<string>("");
+  const [newOrderDate, setNewOrderDate] = useState<string>("");
 
   async function handleCreateOrder() {
     setIsSaving(true);

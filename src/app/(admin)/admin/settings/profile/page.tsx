@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { updateProfile, updatePassword } from "@/lib/api/settings";
 import { SettingsSection, SettingsField, SaveBar, Toast } from "@/components/settings/SettingsUI";
-import { User, KeyRound, Clock } from "lucide-react";
+import { User, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -37,8 +37,9 @@ export default function ProfileSettingsPage() {
         setUser({ ...user, full_name: fullName });
         showToast("Profile updated successfully!", "success");
       }
-    } catch (err: any) {
-      showToast(err.message || "Network error", "error");
+    } catch (err: Error | unknown) {
+      const message = err instanceof Error ? err.message : "Network error";
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }
@@ -56,8 +57,9 @@ export default function ProfileSettingsPage() {
         setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
         showToast("Password changed successfully!", "success");
       }
-    } catch (err: any) {
-      showToast(err.message || "Network error", "error");
+    } catch (err: Error | unknown) {
+      const message = err instanceof Error ? err.message : "Network error";
+      showToast(message, "error");
     } finally {
       setPwdSaving(false);
     }

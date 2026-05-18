@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAllProfiles, updateUserRole, toggleUserActive } from "@/lib/api/settings";
 import { SettingsSection, Toast } from "@/components/settings/SettingsUI";
-import { Users, ShieldCheck, UserX, UserCheck } from "lucide-react";
+import { Users, UserX, UserCheck } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Profile } from "@/types";
 

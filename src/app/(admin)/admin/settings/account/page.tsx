@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { getUserPreferences, upsertUserPreferences } from "@/lib/api/settings";
-import { SettingsSection, SettingsField, SaveBar, Toast, ToggleSwitch } from "@/components/settings/SettingsUI";
-import { Bell } from "lucide-react";
+import { SettingsSection, SettingsField, SaveBar, Toast } from "@/components/settings/SettingsUI";
 import type { UserPreferences } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -60,8 +59,9 @@ export default function AccountSettingsPage() {
         setDirty(false);
         showToast("Preferences saved!", "success");
       }
-    } catch (err: any) {
-      showToast(err.message || "Network error", "error");
+    } catch (err: Error | unknown) {
+      const message = err instanceof Error ? err.message : "Network error";
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }

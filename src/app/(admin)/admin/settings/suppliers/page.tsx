@@ -51,8 +51,9 @@ export default function SupplierSettingsPage() {
         setDirty(false);
         showToast("Supplier settings saved!", "success");
       }
-    } catch (err: any) {
-      showToast(err.message || "Network error", "error");
+    } catch (err: Error | unknown) {
+      const message = err instanceof Error ? err.message : "Network error";
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }

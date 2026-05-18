@@ -13,7 +13,7 @@ import { Modal }                from "@/components/ui/Modal";
 import { useCanWrite }          from "@/components/providers/AuthProvider";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
-import type { Product } from "@/types";
+import type { Product, Category } from "@/types";
 
 export default function InventoryClient() {
   const {
@@ -26,7 +26,7 @@ export default function InventoryClient() {
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   
   const [newProduct, setNewProduct] = useState({
     name: "",
