@@ -8,9 +8,35 @@ export interface Profile {
   email: string;
   role: UserRole;
   avatar_url: string | null;
+  is_active: boolean;
+  last_login_at: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export interface UserPreferences {
+  user_id: string;
+  theme: "light" | "dark" | "system";
+  language: string;
+  timezone: string;
+  date_format: string;
+  number_format: string;
+  notify_email: boolean;
+  notify_low_stock: boolean;
+  notify_order_updates: boolean;
+  notify_system_alerts: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AppSetting {
+  key: string;
+  value: unknown;
+  description: string | null;
+  updated_by: string | null;
+  updated_at: string;
+}
+
 
 // ─── Categories ────────────────────────────────────────────────────────────
 

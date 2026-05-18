@@ -44,6 +44,15 @@ export async function fetchProducts(params: {
   return { products, total: count ?? 0 };
 }
 
+export async function fetchCategories() {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function fetchProduct(id: string) {
   const { data, error } = await supabase
     .from("products")

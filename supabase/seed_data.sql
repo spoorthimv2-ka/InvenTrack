@@ -66,3 +66,57 @@ select
   (select id from public.categories where name = 'Apparel'),
   (i * 20.5) + 10, (i * 12.5) + 5, i * 8, 15
 from generate_series(1, 7) i;
+
+-- ── Add Suppliers ───────────────────────────────────────────────────────────
+insert into public.suppliers (name, contact_name, email, phone, lead_time_days, status) values
+('TechSource Global', 'Alice Smith', 'alice@techsource.demo', '+1-555-0101', 14, 'active'),
+('Office Depot Pro', 'Bob Johnson', 'bob@officedepot.demo', '+1-555-0202', 3, 'active'),
+('Industrial Tools Inc', 'Charlie Brown', 'charlie@industrial.demo', '+1-555-0303', 7, 'active'),
+('Apparel Wholesale', 'Diana Prince', 'diana@apparel.demo', '+1-555-0404', 10, 'active');
+
+-- ── Map Products to Suppliers ───────────────────────────────────────────────
+-- TechSource -> Electronics
+insert into public.product_suppliers (product_id, supplier_id, unit_cost, is_preferred)
+select p.id, s.id, p.cost_price, true
+from public.products p
+join public.suppliers s on s.name = 'TechSource Global'
+where p.sku like 'ELEC-%';
+
+-- Office Depot -> Office Supplies
+insert into public.product_suppliers (product_id, supplier_id, unit_cost, is_preferred)
+select p.id, s.id, p.cost_price, true
+from public.products p
+join public.suppliers s on s.name = 'Office Depot Pro'
+where p.sku like 'OFFC-%';
+
+-- Industrial -> Hardware
+insert into public.product_suppliers (product_id, supplier_id, unit_cost, is_preferred)
+select p.id, s.id, p.cost_price, true
+from public.products p
+join public.suppliers s on s.name = 'Industrial Tools Inc'
+where p.sku like 'HARD-%';
+
+-- Apparel -> Apparel
+insert into public.product_suppliers (product_id, supplier_id, unit_cost, is_preferred)
+select p.id, s.id, p.cost_price, true
+from public.products p
+join public.suppliers s on s.name = 'Apparel Wholesale'
+where p.sku like 'CLOT-%';
+
+-- ── Add Demo Orders ─────────────────────────────────────────────────────────
+-- Note: We assume the user running this script doesn't have an auth.uid() mapped in the script context, 
+-- so created_by will be null.
+insert into public.orders (order_number, supplier_id, status, total_amount, expected_date)
+select 
+  'ORD-DEMO-' || lpad(i::text, 4, '0'),
+  (select id from public.suppliers order by random() limit 1),
+  case (i % 4)
+    when 0 then 'pending'
+    when 1 then 'processing'
+    when 2 then 'completed'
+    else 'cancelled'
+  end,
+  (i * 150.50) + 100,
+  current_date + (i % 10)
+from generate_series(1, 12) i;
+

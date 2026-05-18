@@ -12,6 +12,7 @@ import { StatusBadge }     from "@/components/ui/StatusBadge";
 import { PageLoader }      from "@/components/ui/Loader";
 import { Modal }           from "@/components/ui/Modal";
 import { useAuth }         from "@/components/providers/AuthProvider";
+import { useAuthStore }    from "@/store/auth.store";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { cn }              from "@/lib/utils";
 import type { Order, OrderStatus } from "@/types";
@@ -32,6 +33,39 @@ export default function OrdersClient() {
   const { isAdmin } = useAuth();
   const [selected, setSelected] = useState<Order | null>(null);
   const [showAdd,  setShowAdd]   = useState(false);
+  const [isSaving, setIsSaving]  = useState(false);
+  const [newOrderNotes, setNewOrderNotes] = useState("");
+  const [newOrderDate, setNewOrderDate] = useState("");
+
+  async function handleCreateOrder() {
+    setIsSaving(true);
+    try {
+      // Generate a simple random order number
+      const order_number = "ORD-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      // Get the current user's ID
+      const user = useAuthStore.getState().user;
+
+      await import("@/lib/api/orders").then(api => 
+        api.createOrder({
+          order_number,
+          created_by: user?.id || null,
+          supplier_id: null,
+          status: "pending",
+          expected_date: newOrderDate || null,
+          notes: newOrderNotes || null
+        } as unknown as Order)
+      );
+      setShowAdd(false);
+      setNewOrderNotes("");
+      setNewOrderDate("");
+      load();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create order");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);

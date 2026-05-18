@@ -179,6 +179,34 @@ export default function LoginPage() {
           By signing in you agree to our{" "}
           <span className="text-brand-400 cursor-pointer hover:underline">Terms of Service</span>
         </p>
+
+        {tab === "signin" && (
+          <div className="mt-6 flex flex-col items-center gap-3 border-t border-slate-800/50 pt-5">
+            <p className="text-xs text-slate-500">Quick Demo Access (Auto-fill):</p>
+            <div className="flex w-full gap-3">
+              <button 
+                type="button" 
+                onClick={() => {
+                  setEmail("admin@example.com");
+                  setPassword("admin123");
+                }} 
+                className="flex-1 rounded-md border border-brand-500/30 bg-brand-500/10 py-1.5 text-xs text-brand-400 hover:bg-brand-500/20"
+              >
+                Admin Role
+              </button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setEmail("staff@example.com");
+                  setPassword("staff123");
+                }} 
+                className="flex-1 rounded-md border border-slate-600/50 bg-slate-800 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
+              >
+                Staff Role
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

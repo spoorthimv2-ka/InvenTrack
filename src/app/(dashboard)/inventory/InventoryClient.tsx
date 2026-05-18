@@ -5,7 +5,7 @@ import {
   Package, Plus, Search, Filter, RefreshCcw, TrendingDown, TrendingUp, AlertCircle,
 } from "lucide-react";
 import { useInventoryStore }    from "@/store/inventory.store";
-import { fetchProducts, deleteProduct, createProduct } from "@/lib/api/inventory";
+import { fetchProducts, deleteProduct, createProduct, updateProduct, fetchCategories } from "@/lib/api/inventory";
 import { StatCard }             from "@/components/ui/StatCard";
 import { StatusBadge }          from "@/components/ui/StatusBadge";
 import { PageLoader }           from "@/components/ui/Loader";
@@ -19,13 +19,14 @@ export default function InventoryClient() {
   const {
     products, isLoading, search, categoryFilter, activeFilter, pagination,
     setProducts, setLoading, setSearch, setActiveFilter, setPagination,
-    setSelectedProduct,
+    setSelectedProduct, selectedProduct,
   } = useInventoryStore();
 
   const canWrite = useCanWrite(); // true only for admin
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
   
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -34,6 +35,7 @@ export default function InventoryClient() {
     cost_price: 0,
     stock_quantity: 0,
     reorder_level: 10,
+    category_id: "",
     is_active: true
   });
 
@@ -59,7 +61,10 @@ export default function InventoryClient() {
   }, [search, categoryFilter, activeFilter, pagination.page, pagination.pageSize,
       setProducts, setLoading, setPagination]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { 
+    load(); 
+    fetchCategories().then(setCategories).catch(console.error);
+  }, [load]);
 
   const inStock  = products.filter((p) => p.status === "in_stock").length;
   const lowStock = products.filter((p) => p.status === "low_stock").length;
@@ -72,7 +77,12 @@ export default function InventoryClient() {
     }
     setIsSaving(true);
     try {
-      await createProduct(newProduct as unknown as Product);
+      const payload = {
+        ...newProduct,
+        category_id: newProduct.category_id || null
+      } as unknown as Product;
+
+      await createProduct(payload);
       setShowAddModal(false);
 
       setNewProduct({
@@ -82,12 +92,42 @@ export default function InventoryClient() {
         cost_price: 0,
         stock_quantity: 0,
         reorder_level: 10,
+        category_id: "",
         is_active: true
       });
       load();
     } catch (err) {
       console.error(err);
       alert("Failed to save product.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleUpdateProduct() {
+    if (!selectedProduct || !selectedProduct.name || !selectedProduct.sku) {
+      alert("Name and SKU are required.");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const payload = {
+        name: selectedProduct.name,
+        sku: selectedProduct.sku,
+        unit_price: selectedProduct.unit_price,
+        cost_price: selectedProduct.cost_price,
+        stock_quantity: selectedProduct.stock_quantity,
+        reorder_level: selectedProduct.reorder_level,
+        category_id: selectedProduct.category_id || null,
+        is_active: selectedProduct.is_active,
+      };
+
+      await updateProduct(selectedProduct.id, payload);
+      setSelectedProduct(null);
+      load();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update product.");
     } finally {
       setIsSaving(false);
     }
@@ -275,11 +315,11 @@ export default function InventoryClient() {
               { id: "reorder_level",  label: "Reorder Level", type: "number" },
             ].map(({ id, label, type }) => (
               <div key={id}>
-                <label htmlFor={id} className="mb-1 block text-xs font-medium text-slate-400">
+                <label htmlFor={`add-${id}`} className="mb-1 block text-xs font-medium text-slate-400">
                   {label}
                 </label>
                 <input 
-                  id={id} 
+                  id={`add-${id}`} 
                   type={type} 
                   className="input" 
                   placeholder={label}
@@ -291,6 +331,22 @@ export default function InventoryClient() {
                 />
               </div>
             ))}
+            <div>
+              <label htmlFor="add-category" className="mb-1 block text-xs font-medium text-slate-400">
+                Category
+              </label>
+              <select
+                id="add-category"
+                className="input"
+                value={newProduct.category_id}
+                onChange={(e) => setNewProduct({ ...newProduct, category_id: e.target.value })}
+              >
+                <option value="">None</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="mt-5 flex justify-end gap-2">
             <button 
@@ -306,6 +362,82 @@ export default function InventoryClient() {
               disabled={isSaving}
             >
               {isSaving ? "Saving..." : "Save Product"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Edit Modal — admin only */}
+      {canWrite && selectedProduct && (
+        <Modal open={true} onClose={() => setSelectedProduct(null)} title="Edit Product">
+          <div className="space-y-3">
+            {[
+              { id: "name",       label: "Product Name",  type: "text" },
+              { id: "sku",        label: "SKU",           type: "text" },
+              { id: "unit_price", label: "Unit Price",    type: "number" },
+              { id: "cost_price", label: "Cost Price",    type: "number" },
+              { id: "stock_quantity", label: "Stock Qty", type: "number" },
+              { id: "reorder_level",  label: "Reorder Level", type: "number" },
+            ].map(({ id, label, type }) => (
+              <div key={id}>
+                <label htmlFor={`edit-${id}`} className="mb-1 block text-xs font-medium text-slate-400">
+                  {label}
+                </label>
+                <input 
+                  id={`edit-${id}`} 
+                  type={type} 
+                  className="input" 
+                  placeholder={label}
+                  value={selectedProduct[id as keyof typeof selectedProduct] as string | number}
+                  onChange={(e) => setSelectedProduct({
+                    ...selectedProduct,
+                    [id]: type === "number" ? parseFloat(e.target.value) || 0 : e.target.value
+                  })}
+                />
+              </div>
+            ))}
+            <div>
+              <label htmlFor="edit-category" className="mb-1 block text-xs font-medium text-slate-400">
+                Category
+              </label>
+              <select
+                id="edit-category"
+                className="input"
+                value={selectedProduct.category_id || ""}
+                onChange={(e) => setSelectedProduct({ ...selectedProduct, category_id: e.target.value })}
+              >
+                <option value="">None</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 mt-4 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={selectedProduct.is_active}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, is_active: e.target.checked })}
+                  className="rounded border-slate-700 bg-slate-800 text-brand-500 focus:ring-brand-500"
+                />
+                Product is active
+              </label>
+            </div>
+          </div>
+          <div className="mt-5 flex justify-end gap-2">
+            <button 
+              className="btn-secondary" 
+              onClick={() => setSelectedProduct(null)}
+              disabled={isSaving}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn-primary" 
+              onClick={handleUpdateProduct}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Update Product"}
             </button>
           </div>
         </Modal>
