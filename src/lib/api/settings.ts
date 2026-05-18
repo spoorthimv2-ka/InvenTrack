@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { UserPreferences, Profile, AppSetting } from "@/types";
+import type { UserPreferences, Profile } from "@/types";
 
 // ── Profile ──────────────────────────────────────────────────────────────────
 
