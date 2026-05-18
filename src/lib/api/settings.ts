@@ -74,7 +74,7 @@ export async function getAppSettings(): Promise<Record<string, unknown>> {
   const supabase = createClient();
   const { data } = await supabase.from("app_settings").select("key, value");
   if (!data) return {};
-  return Object.fromEntries(data.map((row: AppSetting) => [row.key, row.value]));
+  return Object.fromEntries(data.map((row: { key: string; value: unknown }) => [row.key, row.value]));
 }
 
 export async function updateAppSetting(
